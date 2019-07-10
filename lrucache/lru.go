@@ -3,6 +3,53 @@ package lrucache
 // cacheItem represents a value stored in a cache
 type cacheItem struct {
 	value interface{}
+	prev  *cacheItem
+	next  *cacheItem
+}
+
+type doubleLinkedList struct {
+	head *cacheItem
+	tail *cacheItem
+}
+
+func (dl *doubleLinkedList) addItem(val interface{}) *cacheItem {
+	item := &cacheItem{
+		value: val,
+		next:  dl.head,
+	}
+	if dl.head != nil {
+		dl.head.prev = item
+	}
+	if dl.tail == nil {
+		dl.tail = item
+	}
+	dl.head = item
+
+	return item
+}
+
+func (dl *doubleLinkedList) moveToHead(item *cacheItem) {
+	if dl.head == item {
+		return
+	}
+	prev := item.prev
+	next := item.next
+
+	if dl.tail == item {
+		dl.tail = prev
+	}
+
+	item.prev = nil
+	item.next = dl.head
+	dl.head.prev = item
+	dl.head = item
+
+	if prev != nil {
+		prev.next = next
+	}
+	if next != nil {
+		next.prev = prev
+	}
 }
 
 // Cache describes a general interface of the cache
@@ -17,6 +64,7 @@ type LRU struct {
 	size     uint
 	capacity uint
 	storage  map[string]*cacheItem
+	list     doubleLinkedList
 }
 
 // New is a factory function for LRU struct
@@ -29,15 +77,20 @@ func New(capacity uint) *LRU {
 
 // Set puts value into a cache
 func (lru *LRU) Set(key string, val interface{}) bool {
-	lru.storage[key] = &cacheItem{
-		value: val,
-	}
-	if lru.size > lru.capacity {
-		//TODO: run eviction here
-		return true
-	}
+	var evicted bool
+	item := lru.list.addItem(val)
+
 	lru.size++
-	return false
+	lru.storage[key] = item
+
+	if lru.size > lru.capacity {
+		lru.size = lru.capacity
+
+		//TODO: run eviction here
+
+	}
+
+	return evicted
 }
 
 // Has checks if a key in the cache
@@ -53,7 +106,7 @@ func (lru *LRU) Get(key string) (interface{}, bool) {
 	if !ok {
 		return nil, false
 	}
-	// TODO: Update least recently used
+	lru.list.moveToHead(item)
 
 	return item.value, ok
 }

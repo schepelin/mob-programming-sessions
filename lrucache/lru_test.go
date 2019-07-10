@@ -42,5 +42,98 @@ func TestLRU_Get(t *testing.T) {
 		assert.Equal(t, "bar", val)
 
 	})
+}
 
+func Test_DoubleLinkedList(t *testing.T) {
+	assert := assert.New(t)
+	t.Run("Add to a list for empty", func(t *testing.T) {
+		l := &doubleLinkedList{}
+		item := l.addItem(42)
+		assert.Equal(l.head, item)
+		assert.Equal(l.tail, item)
+	})
+	t.Run("Add to list with items", func(t *testing.T) {
+		existing := &cacheItem{
+			value: "foo",
+		}
+		l := &doubleLinkedList{
+			head: existing,
+			tail: existing,
+		}
+		new := l.addItem("bar")
+		assert.Equal(new, l.head)
+		assert.Equal(l.tail, l.head.next)
+		assert.Equal(existing, l.tail)
+	})
+
+	t.Run("moveToHead. for head does nothing", func(t *testing.T) {
+		item := &cacheItem{
+			value: "foo",
+		}
+		l := &doubleLinkedList{
+			head: item,
+			tail: item,
+		}
+		l.moveToHead(item)
+		assert.Equal(item, l.head)
+	})
+
+	t.Run("moveToHead. moves a middle element to head", func(t *testing.T) {
+		first := &cacheItem{
+			value: 1,
+		}
+		second := &cacheItem{
+			value: 2,
+		}
+		third := &cacheItem{
+			value: 3,
+		}
+		first.next = second
+		second.prev = first
+		second.next = third
+		third.prev = second
+
+		l := &doubleLinkedList{
+			head: first,
+			tail: third,
+		}
+		l.moveToHead(second)
+
+		assert.Equal(second, l.head)
+		assert.Nil(l.head.prev)
+		assert.Equal(first, second.next)
+		assert.Equal(third, first.next)
+		assert.Equal(first, third.prev)
+		assert.Nil(third.next)
+		assert.Equal(third, l.tail)
+	})
+
+	t.Run("moveToHead. moves a the last element to head", func(t *testing.T) {
+		first := &cacheItem{
+			value: 1,
+		}
+		second := &cacheItem{
+			value: 2,
+		}
+		third := &cacheItem{
+			value: 3,
+		}
+		first.next = second
+		second.prev = first
+		second.next = third
+		third.prev = second
+		l := &doubleLinkedList{
+			head: first,
+			tail: third,
+		}
+
+		l.moveToHead(third)
+
+		assert.Equal(third, l.head)
+		assert.Nil(third.prev)
+		assert.Equal(second, l.tail)
+		assert.Nil(second.next)
+		assert.Equal(first, third.next)
+		assert.Equal(third, first.prev)
+	})
 }
