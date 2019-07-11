@@ -2,10 +2,9 @@
 
 [LRU visually explained](https://www.youtube.com/watch?v=DUbEgNw-F9c&t=1539s)
 
-
 ## Implementation
 
-Your task is to implement the next interface
+Your assignment is to implement the next interface
 
 ```go
 // Cache describes a general interface of the cache
@@ -31,8 +30,7 @@ val, ok := item.(int)
 fmt.Println(val, ok) // 42, true
 ```
 
-
-Example of the eviction mechanics:
+Examples of the eviction mechanics:
 
 ```go
 c := NewCahce(1)
@@ -48,15 +46,14 @@ c.Has("foo") // false
 c.Has("bar") // true
 ```
 
-
 ```go
 c := Cahce(1000)
 
-# evicted is a bool value identify if capacity has reached
+// evicted is a bool value identify if capacity has reached
 evicted := c.Set("somekey", "somevalue")
 
 val, ok := c.Get("somekey")
 
-# returns true if a value is in cache
+// returns true if a value is in cache
 ok := c.Has("somekey")
 ```
