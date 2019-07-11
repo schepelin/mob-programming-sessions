@@ -3,6 +3,7 @@ package lrucache
 // cacheItem represents a value stored in a cache
 type cacheItem struct {
 	value interface{}
+	key   string
 	prev  *cacheItem
 	next  *cacheItem
 }
@@ -12,9 +13,10 @@ type doubleLinkedList struct {
 	tail *cacheItem
 }
 
-func (dl *doubleLinkedList) addItem(val interface{}) *cacheItem {
+func (dl *doubleLinkedList) addItem(val interface{}, key string) *cacheItem {
 	item := &cacheItem{
 		value: val,
+		key:   key,
 		next:  dl.head,
 	}
 	if dl.head != nil {
@@ -52,6 +54,14 @@ func (dl *doubleLinkedList) moveToHead(item *cacheItem) {
 	}
 }
 
+func (dl *doubleLinkedList) popTail() *cacheItem {
+	item := dl.tail
+	dl.tail = item.prev
+	dl.tail.next = nil
+	item.prev = nil
+	return item
+}
+
 // Cache describes a general interface of the cache
 type Cache interface {
 	Set(key string, value interface{}) (evicted bool)
@@ -78,16 +88,16 @@ func New(capacity uint) *LRU {
 // Set puts value into a cache
 func (lru *LRU) Set(key string, val interface{}) bool {
 	var evicted bool
-	item := lru.list.addItem(val)
+	item := lru.list.addItem(val, key)
 
 	lru.size++
 	lru.storage[key] = item
 
 	if lru.size > lru.capacity {
+		item := lru.list.popTail()
+		delete(lru.storage, item.key)
 		lru.size = lru.capacity
-
-		//TODO: run eviction here
-
+		evicted = true
 	}
 
 	return evicted

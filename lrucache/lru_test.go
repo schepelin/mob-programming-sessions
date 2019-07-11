@@ -48,7 +48,8 @@ func Test_DoubleLinkedList(t *testing.T) {
 	assert := assert.New(t)
 	t.Run("Add to a list for empty", func(t *testing.T) {
 		l := &doubleLinkedList{}
-		item := l.addItem(42)
+		item := l.addItem(42, "foo")
+		assert.Equal("foo", item.key)
 		assert.Equal(l.head, item)
 		assert.Equal(l.tail, item)
 	})
@@ -60,7 +61,7 @@ func Test_DoubleLinkedList(t *testing.T) {
 			head: existing,
 			tail: existing,
 		}
-		new := l.addItem("bar")
+		new := l.addItem("bar", "baz")
 		assert.Equal(new, l.head)
 		assert.Equal(l.tail, l.head.next)
 		assert.Equal(existing, l.tail)
@@ -135,5 +136,19 @@ func Test_DoubleLinkedList(t *testing.T) {
 		assert.Nil(second.next)
 		assert.Equal(first, third.next)
 		assert.Equal(third, first.prev)
+	})
+}
+
+func Test_UseCases(t *testing.T) {
+
+	t.Run("Cache evicts value if capacity reached", func(t *testing.T) {
+		c := New(1)
+
+		evicted1 := c.Set("foo", 42)
+		evicted2 := c.Set("bar", 43)
+
+		assert.False(t, evicted1)
+		assert.True(t, evicted2)
+		assert.False(t, c.Has("foo"))
 	})
 }
