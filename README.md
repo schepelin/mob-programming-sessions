@@ -1,8 +1,5 @@
 # Mob programming
 
-
-
-
 ## Links
 
 - [Blog: Mob programming](http://mobprogramming.org/)
