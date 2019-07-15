@@ -13,7 +13,7 @@ type doubleLinkedList struct {
 	tail *cacheItem
 }
 
-func (dl *doubleLinkedList) addItem(val interface{}, key string) *cacheItem {
+func (dl *doubleLinkedList) addItem(key string, val interface{}) *cacheItem {
 	item := &cacheItem{
 		value: val,
 		key:   key,
@@ -56,9 +56,14 @@ func (dl *doubleLinkedList) moveToHead(item *cacheItem) {
 
 func (dl *doubleLinkedList) popTail() *cacheItem {
 	item := dl.tail
-	dl.tail = item.prev
-	dl.tail.next = nil
 	item.prev = nil
+	dl.tail = item.prev
+	if dl.tail == nil {
+		dl.head = nil
+	}
+	if dl.tail != nil {
+		dl.tail.next = nil
+	}
 	return item
 }
 
@@ -87,20 +92,19 @@ func New(capacity uint) *LRU {
 
 // Set puts value into a cache
 func (lru *LRU) Set(key string, val interface{}) bool {
-	var evicted bool
-	item := lru.list.addItem(val, key)
+	item := lru.list.addItem(key, val)
 
 	lru.size++
 	lru.storage[key] = item
 
-	if lru.size > lru.capacity {
-		item := lru.list.popTail()
-		delete(lru.storage, item.key)
-		lru.size = lru.capacity
-		evicted = true
+	if lru.size <= lru.capacity {
+		return false
 	}
+	last := lru.list.popTail()
+	delete(lru.storage, last.key)
+	lru.size = lru.capacity
 
-	return evicted
+	return true
 }
 
 // Has checks if a key in the cache
@@ -118,5 +122,5 @@ func (lru *LRU) Get(key string) (interface{}, bool) {
 	}
 	lru.list.moveToHead(item)
 
-	return item.value, ok
+	return item.value, true
 }

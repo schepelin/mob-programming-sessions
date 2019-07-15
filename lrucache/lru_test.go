@@ -48,7 +48,7 @@ func Test_DoubleLinkedList(t *testing.T) {
 	assert := assert.New(t)
 	t.Run("Add to a list for empty", func(t *testing.T) {
 		l := &doubleLinkedList{}
-		item := l.addItem(42, "foo")
+		item := l.addItem("foo", 42)
 		assert.Equal("foo", item.key)
 		assert.Equal(l.head, item)
 		assert.Equal(l.tail, item)
