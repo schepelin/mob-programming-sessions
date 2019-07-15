@@ -1,5 +1,32 @@
 # Mob programming
 
+## Principles
+
+### Test-Driven
+
+Write a test before you write any line of code
+
+### Consumer-first vs Build-up
+
+```go
+
+// build up
+type Point struct {
+    x int
+    y int
+}
+
+// consume first
+func NewPoint(x,y int) *Point{
+
+}
+```
+
+### Refine existing code
+
+Do not throw existing code, refine it!
+Each iteration should make a step forward.
+
 ## Links
 
 - [Blog: Mob programming](http://mobprogramming.org/)
