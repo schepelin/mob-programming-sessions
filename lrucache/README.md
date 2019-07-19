@@ -13,7 +13,7 @@
 Your assignment is to implement the next interface
 
 ```go
-// Cache describes the common interface
+// Cache interface
 type Cache interface {
     Set(key string, value interface{}) (evicted bool)
     Get(key string) (value interface{}, ok bool)
@@ -21,7 +21,17 @@ type Cache interface {
 }
 ```
 
-Example of cache Get/Set:
+Examples of `Has` method:
+
+```go
+c := NewCache(10)
+c.Has("a key") // false
+
+c.Set("answer", 42)
+c.Has("anwser") // true
+```
+
+Example of cache `Get` and `Set` methods:
 
 ```go
 c := NewCache(10)
@@ -36,13 +46,13 @@ val, ok := item.(int)
 fmt.Println(val, ok) // 42, true
 ```
 
-Examples of the eviction mechanics:
+Examples of `Set` method with eviction:
 
 ```go
 c := NewCache(1)
 
 if ok := c.Set("foo", 42); ok {
-    fmt.Println("It will newer called")
+    fmt.Println("It will not be printed")
 }
 if ok := c.Set("bar", 100500); ok {
     fmt.Println("Previous value was evicted")
@@ -50,16 +60,4 @@ if ok := c.Set("bar", 100500); ok {
 
 c.Has("foo") // false
 c.Has("bar") // true
-```
-
-```go
-c := NewCache(1000)
-
-// evicted is a bool value identify if capacity has reached
-evicted := c.Set("somekey", "somevalue") // evicted == false
-
-val, ok := c.Get("somekey")
-
-// returns true if a value is in cache
-ok := c.Has("somekey") // ok == true
 ```
