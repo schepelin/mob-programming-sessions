@@ -2,19 +2,62 @@
 
 [LRU visually explained](https://www.youtube.com/watch?v=DUbEgNw-F9c&t=1539s)
 
+## Principles
+
+- Test-Driven
+- Consumer-First
+- Refine existing code
+
 ## Implementation
 
-User can create a cache instance with predefined capacity
-For simplicity cache can store string to string mapping
+Your assignment is to implement the next interface
 
 ```go
-c := Cahce(1000)
+// Cache interface
+type Cache interface {
+    Set(key string, value interface{}) (evicted bool)
+    Get(key string) (value interface{}, ok bool)
+    Has(key string) (ok bool)
+}
+```
 
-# evicted is a bool value identify if capacity has reached
-evicted := c.Set("somekey", "somevalue")
+Examples of `Has` method:
 
-val, ok := c.Get("somekey")
+```go
+c := NewCache(10)
+c.Has("a key") // false
 
-# returns true if a value is in cache
-ok := c.Has("somekey")
+c.Set("answer", 42)
+c.Has("anwser") // true
+```
+
+Example of cache `Get` and `Set` methods:
+
+```go
+c := NewCache(10)
+
+_ = c.Set("foo", 42)
+
+item, ok := c.Get("foo")
+
+fmt.Println(ok) // true
+
+val, ok := item.(int)
+fmt.Println(val, ok) // 42, true
+```
+
+Examples of `Set` method with eviction:
+
+```go
+c := NewCache(1)
+
+if ok := c.Set("foo", 42); ok {
+    fmt.Println("It will not be printed")
+}
+if ok := c.Set("bar", 100500); ok {
+    fmt.Println("Previous value was evicted")
+}
+
+c.Has("foo") // false
+c.Has("bar") // true
 ```
