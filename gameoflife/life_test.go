@@ -6,22 +6,48 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_GameOfLife(t *testing.T) {
-	initState := [5][5]int8{
-		[5]int8{0, 0, 0, 0, 0},
-		[5]int8{0, 0, 1, 0, 0},
-		[5]int8{0, 0, 0, 1, 0},
-		[5]int8{0, 1, 1, 1, 0},
-		[5]int8{0, 0, 0, 0, 0},
-	}
-	expectedState := [5][5]int8{
-		[5]int8{0, 0, 0, 0, 0},
-		[5]int8{0, 0, 0, 0, 0},
-		[5]int8{0, 1, 0, 1, 0},
-		[5]int8{0, 0, 1, 1, 0},
-		[5]int8{0, 0, 1, 0, 0},
-	}
-	l := NewLife(initState)
+func emptyGrid(size uint) [][]bool {
+	grid := make([][]bool, size)
 
-	assert.Equal(t, expectedState, l.Tick())
+	for i := range grid {
+		grid[i] = make([]bool, size)
+	}
+	return grid
+}
+
+// generates a glider shape in the top left corner
+// .#.
+// ..#
+// ###
+func glider(size uint) [][]bool{
+	grid := emptyGrid(size)
+	grid[0][1] = true
+	grid[1][2] = true
+	grid[2][0] = true
+	grid[2][1] = true
+	grid[2][2] = true
+	return grid
+}
+
+func Test_GameOfLife_Tick(t *testing.T) {
+	var gridSize uint = 10
+	initialState := glider(gridSize)
+
+	l := NewLife(initialState)
+
+	l.Next()
+	expected := `
+..........
+#.#.......
+.##.......
+.#........
+..........
+..........
+..........
+..........
+..........
+..........
+`
+
+	assert.Equal(t, expected, l.String())
 }
