@@ -21,3 +21,17 @@ Every cell interacts with its eight neighbors, which are the cells that are hori
 Above rules apply simultaneously to every cell in the grid.
 
 Births and deaths occur simultaneously, and the discrete moment at which this happens is sometimes called a tick.
+
+## Implementation
+
+You're given an input with initial generation where `.` means a dead cell, and `#` means an alive cell:
+
+```
+..........
+...##.....
+....#.....
+..........
+..........
+```
+
+Your task is to apply all the rules and print the next generation
